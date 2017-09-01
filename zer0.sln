@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.hud", "zer0.hud\zer0.hud.csproj", "{2B8FF05A-D89A-42D0-9656-4C742167DB4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.cmd.eval", "zer0.cmd.eval\zer0.cmd.eval.csproj", "{854D0209-5F77-46BC-B3E9-53102E0D8489}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.core", "zer0.core\zer0.core.csproj", "{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.channel.telegram", "zer0.channel.telegram\zer0.channel.telegram.csproj", "{3A06762E-E0B5-4D47-B4E5-4D8C64D9259F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.channel.vk", "zer0.channel.vk\zer0.channel.vk.csproj", "{856A6ECE-7DC7-4354-8A13-569C8CE507AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.storage.sqlite", "zer0.storage.sqlite\zer0.storage.sqlite.csproj", "{9D40E4B9-2DA8-4300-A9E4-E271512A3EF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zer0.loader.torrent", "zer0.loader.torrent\zer0.loader.torrent.csproj", "{20FCBA02-7E13-409E-8AD0-186D2911EA46}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2B8FF05A-D89A-42D0-9656-4C742167DB4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B8FF05A-D89A-42D0-9656-4C742167DB4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B8FF05A-D89A-42D0-9656-4C742167DB4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B8FF05A-D89A-42D0-9656-4C742167DB4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{854D0209-5F77-46BC-B3E9-53102E0D8489}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{854D0209-5F77-46BC-B3E9-53102E0D8489}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{854D0209-5F77-46BC-B3E9-53102E0D8489}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{854D0209-5F77-46BC-B3E9-53102E0D8489}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A06762E-E0B5-4D47-B4E5-4D8C64D9259F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A06762E-E0B5-4D47-B4E5-4D8C64D9259F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A06762E-E0B5-4D47-B4E5-4D8C64D9259F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A06762E-E0B5-4D47-B4E5-4D8C64D9259F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{856A6ECE-7DC7-4354-8A13-569C8CE507AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{856A6ECE-7DC7-4354-8A13-569C8CE507AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{856A6ECE-7DC7-4354-8A13-569C8CE507AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{856A6ECE-7DC7-4354-8A13-569C8CE507AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D40E4B9-2DA8-4300-A9E4-E271512A3EF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D40E4B9-2DA8-4300-A9E4-E271512A3EF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D40E4B9-2DA8-4300-A9E4-E271512A3EF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D40E4B9-2DA8-4300-A9E4-E271512A3EF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20FCBA02-7E13-409E-8AD0-186D2911EA46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20FCBA02-7E13-409E-8AD0-186D2911EA46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20FCBA02-7E13-409E-8AD0-186D2911EA46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20FCBA02-7E13-409E-8AD0-186D2911EA46}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

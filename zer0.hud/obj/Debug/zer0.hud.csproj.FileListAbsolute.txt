@@ -1,0 +1,14 @@
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.hud.exe.config
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.hud.exe
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.hud.pdb
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.core.dll
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.core.pdb
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\obj\Debug\zer0.hud.csprojResolveAssemblyReference.cache
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\obj\Debug\zer0.hud.exe
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\obj\Debug\zer0.hud.pdb
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\System.Runtime.dll
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\System.Collections.Immutable.dll
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\System.ValueTuple.dll
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\System.Collections.Immutable.xml
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\System.ValueTuple.xml
+C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\obj\Debug\zer0.hud.csproj.CoreCompileInputs.cache

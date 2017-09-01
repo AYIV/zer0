@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD01E876-2D1C-4FE5-AF48-E8F9089E8744}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>zer0.core</RootNamespace>
+    <AssemblyName>zer0.core</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contracts\ChannelBase.cs" />
+    <Compile Include="Contracts\ConfigProviderBase.cs" />
+    <Compile Include="Contracts\IConfigProvider.cs" />
+    <Compile Include="Contracts\IConfigProviderFactory.cs" />
+    <Compile Include="Contracts\IModule.cs" />
+    <Compile Include="Contracts\IObjectFactory.cs" />
+    <Compile Include="Contracts\ISelfManagingChannel.cs" />
+    <Compile Include="Contracts\IStorage.cs" />
+    <Compile Include="Contracts\MessageBase.cs" />
+    <Compile Include="Contracts\MessageType.cs" />
+    <Compile Include="Contracts\ModuleBase.cs" />
+    <Compile Include="Loaders\ChannelLoader.cs" />
+    <Compile Include="Channels\ConsoleChannel.cs" />
+    <Compile Include="Contracts\ActionBase.cs" />
+    <Compile Include="Loaders\CommandLoader.cs" />
+    <Compile Include="Commands\Factory.cs" />
+    <Compile Include="Commands\RingAlarm.cs" />
+    <Compile Include="Contracts\IMessage.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Contracts\IAction.cs" />
+    <Compile Include="Contracts\ICommandFactory.cs" />
+    <Compile Include="Loaders\Loader.cs" />
+    <Compile Include="Messages\CommandMessage.cs" />
+    <Compile Include="Messages\TextMessage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Storages\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
