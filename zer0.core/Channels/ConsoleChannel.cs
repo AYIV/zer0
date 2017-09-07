@@ -22,7 +22,7 @@ namespace zer0.core
 
 		public void Start() => ThreadPool.QueueUserWorkItem(e =>
 		{
-			while (!_stopProcessing) ToZer0(new TextMessage(Console.ReadLine(), Guid.NewGuid()));
+			while (!_stopProcessing) ToZer0(new TextMessage(Console.ReadLine(), Guid.NewGuid(), Provider));
 		});
 
 		public void Stop() => _stopProcessing = true;

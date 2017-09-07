@@ -19,6 +19,8 @@ namespace zer0.core.Messages
 			Channel = channel;
 		}
 
-		public static IMessage New(string message, string channel = null) => new TextMessage(message, channel);
+		public static IMessage New(string text, string channel = null) => new TextMessage(text, channel);
+
+		public static IMessage New(string text, IMessage message) => new TextMessage(text).SetContext(message);
 	}
 }
