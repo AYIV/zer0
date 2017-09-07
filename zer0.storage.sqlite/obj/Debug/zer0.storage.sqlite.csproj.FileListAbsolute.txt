@@ -1,6 +1,0 @@
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.storage.sqlite.dll
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.storage.sqlite.pdb
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.storage.sqlite\obj\Debug\zer0.storage.sqlite.csprojResolveAssemblyReference.cache
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.storage.sqlite\obj\Debug\zer0.storage.sqlite.dll
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.storage.sqlite\obj\Debug\zer0.storage.sqlite.pdb
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.storage.sqlite\obj\Debug\zer0.storage.sqlite.csproj.CoreCompileInputs.cache
