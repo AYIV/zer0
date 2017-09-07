@@ -23,7 +23,14 @@ namespace zer0.core.Contracts
 			Message = message;
 			Type = type;
 		}
+		
+		public IMessage SetContext(IMessage contextMessage)
+		{
+			Context = contextMessage;
 
-		public void SetContext(IMessage contextMessage) => Context = contextMessage;
+			return this;
+		}
+
+		public bool HasContext => Context != null;
 	}
 }

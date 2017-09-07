@@ -11,5 +11,7 @@ namespace zer0.core.Contracts
 		object Message { get; }
 
 		IMessage Context { get; }
+
+		bool HasContext { get; }
 	}
 }

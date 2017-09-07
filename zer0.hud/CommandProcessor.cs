@@ -15,12 +15,15 @@ namespace zer0.hud
 		private readonly IDictionary<string, IChannel> _channels;
 
 		private readonly IDictionary<Guid, IAction> _actions;
+
+		private readonly IDictionary<Guid, string> _processed;
 		
 		public CommandProcessor(CommandLoader loader, IEnumerable<IChannel> channels)
 		{
 			_loader = loader;
 			_channels = channels.ToDictionary(x => x.Provider, x => x);
 			_actions = new Dictionary<Guid, IAction>();
+			_processed = new Dictionary<Guid, string>();
 		}
 
 		public void Process(IMessage message)
@@ -37,11 +40,13 @@ namespace zer0.hud
 
 			if (message.Type == MessageType.Text)
 			{
-				var channel = ((TextMessage)message).Channel ?? string.Empty;
+				var channel = ((TextMessage)message).Channel ?? _processed.Key(message.Context.Id) ?? string.Empty;
 				if (_channels.ContainsKey(channel))
 					_channels[channel].Process(message);
 				else
 					_channels.Values.ForEach(x => x.Process(message));
+
+				_processed[message.Id] = channel;
 			}
 		}
 

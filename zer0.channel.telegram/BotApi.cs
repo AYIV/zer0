@@ -67,7 +67,7 @@ namespace zer0.channel.telegram
 		public new TValue this[TKey key]
 		{
 			get => this[ContainsKey(key) ? key : default(TKey)];
-			set => this[key] = value;
+			set => base[key] = value;
 		}
 	}
 }

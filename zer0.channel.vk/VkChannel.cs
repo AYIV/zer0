@@ -46,7 +46,7 @@ namespace zer0.channel.vk
 				{
 					ApplicationId = 5255274,
 					Login = "380997466776",
-					Password = "w3c0mm",
+					Password = "2wsx#EDC4rvkontakte",
 					Settings = Settings.All
 				});
 
@@ -130,22 +130,6 @@ namespace zer0.channel.vk
 		public override bool Supports(IMessage message)
 		{
 			throw new System.NotImplementedException();
-		}
-	}
-
-	public static class DictionaryExtensions
-	{
-		public static TValue Key<TKey, TValue>(this IDictionary<TKey, TValue> @this, TKey key)
-			=> @this.ContainsKey(key) ? @this[key] : default(TValue);
-
-		public static IEnumerable<TKey> MissedKeys<TKey, TValue>(this IDictionary<TKey, TValue> @this, IEnumerable<TKey> keys)
-		{
-			foreach (var key in keys)
-			{
-				if (@this.ContainsKey(key)) continue;
-
-				yield return key;
-			}
 		}
 	}
 }
