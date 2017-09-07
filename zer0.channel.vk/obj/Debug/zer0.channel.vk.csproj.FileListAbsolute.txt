@@ -1,7 +1,0 @@
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.channel.vk.dll.config
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.channel.vk.dll
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.hud\bin\Debug\zer0.channel.vk.pdb
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.channel.vk\obj\Debug\zer0.channel.vk.csprojResolveAssemblyReference.cache
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.channel.vk\obj\Debug\zer0.channel.vk.dll
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.channel.vk\obj\Debug\zer0.channel.vk.pdb
-C:\Users\admin\documents\visual studio 2017\Projects\zer0\zer0.channel.vk\obj\Debug\zer0.channel.vk.csproj.CoreCompileInputs.cache
