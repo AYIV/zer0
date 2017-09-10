@@ -75,7 +75,7 @@ namespace zer0.channel.vk
 					
 					messages
 						.GroupBy(x => x.UserId)
-						.ForEach(x => ToZer0(TextMessage.New($"{_nameMap[x.Key.ToString()]}\n{string.Join("\n", x.OrderBy(z => z.Date).Select(z => $"[{z.Date}] {z.Body}"))}")));
+						.ForEach(x => ToZero(TextMessage.New($"{_nameMap[x.Key.ToString()]}\n{string.Join("\n", x.OrderBy(z => z.Date).Select(z => $"[{z.Date}] {z.Body}"))}")));
 				}
 			});
 		}

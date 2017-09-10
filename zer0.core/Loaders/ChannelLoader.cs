@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using zer0.core.Contracts;
 using zer0.core.Extensions;
 
-using IMessage = zer0.core.Contracts.IMessage;
-
 namespace zer0.core
 {
 	public sealed class ChannelLoader : IDisposable
@@ -19,7 +17,7 @@ namespace zer0.core
 			_configFactory = _loader.GetInstance<IConfigProviderFactory>();
 		}
 
-		public IEnumerable<IChannel> Load(Func<IMessage, bool> send)
+		public IEnumerable<IChannel> Load(ZeroCallback send)
 		{
 			var channels = _loader.GetInstances<IChannel>();
 

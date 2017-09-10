@@ -53,6 +53,7 @@
     <Compile Include="Contracts\MessageBase.cs" />
     <Compile Include="Contracts\MessageType.cs" />
     <Compile Include="Contracts\ModuleBase.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Loaders\ChannelLoader.cs" />
     <Compile Include="Channels\ConsoleChannel.cs" />
     <Compile Include="Contracts\ActionBase.cs" />

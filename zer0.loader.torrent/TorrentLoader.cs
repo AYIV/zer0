@@ -19,10 +19,10 @@ namespace zer0.loader.torrent
 
 		private IDictionary<Guid, string> torrentContext = new Dictionary<Guid, string>();
 
-		private Func<IMessage, bool> ToZer0;
+		private ZeroCallback ToZer0;
 		private QBittorrentApi _torrent;
 
-		public void Init(IConfigProvider config, Func<IMessage, bool> callback)
+		public void Init(IConfigProvider config, ZeroCallback callback)
 		{
 			ToZer0 = callback;
 
@@ -33,7 +33,8 @@ namespace zer0.loader.torrent
 		{
 			_supportedCommands = new Dictionary<string, Func<IMessage, IMessage>>
 			{
-				{ "files", Files }
+				{ "/files", Files },
+                { "/torrents", m => TextMessage.New($"{string.Join("\n\n", _torrent.GetAll().Select(x => x.Hash + "\n" + x.Name))}") }
 			};
 
 			_torrent = new QBittorrentApi(Host);
@@ -41,9 +42,7 @@ namespace zer0.loader.torrent
 
 		public override bool Supports(IMessage message)
 		{
-			if (message.Type != MessageType.Text) return false;
-
-			var msg = (string)message.Message;
+			var msg = (string) message.Message;
 
 			if (string.IsNullOrWhiteSpace(msg)) return false;
 
@@ -58,20 +57,18 @@ namespace zer0.loader.torrent
 		{
 			if (!Supports(message)) return false;
 
-			var msg = (string)message.Message;
+			var msg = message is CommandMessage cmsg
+                ? cmsg.Command
+                : (string)message.Message;
+            msg = msg.Trim();
 
-			if (_supportedCommands.Keys.Any(msg.StartsWith))
+			if (_supportedCommands.ContainsKey(msg))
 			{
-				switch (msg)
-				{
-					case "files":
-						ToZer0(Files(message));
-						break;
-					default:
-						return false;
-				}
-				return true;
-			}
+				return ToZer0(
+                    _supportedCommands[msg](message),
+                    this
+                );
+            }
 
 			var tokens = msg.ToLower().Split();
 			var link = new Uri(tokens.Last());
@@ -81,7 +78,7 @@ namespace zer0.loader.torrent
 			var added = _torrent.Get(link);
 			if (added != null)
 			{
-				ToZer0(TextMessage.New($"Torrent succesfully added!\n{added.Name}"));
+				ToZer0(TextMessage.New($"Torrent succesfully added!\n{added.Name}"), this);
 				torrentContext[message.Id] = added.Hash;
 			}
 

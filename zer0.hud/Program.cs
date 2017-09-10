@@ -21,14 +21,17 @@ namespace zer0.hud
 			Console.Title = "zer0";
 			Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-			var lastMessage = (IMessage)null;
-			Func<IMessage, bool> func = message =>
+			var lastCommand = (IMessage)null;
+			ZeroCallback func = (message, module) =>
 			{
-				((MessageBase)message).SetContext(lastMessage);
+                if (module is IChannel && message is IChannelMessage cmsg)
+                    cmsg.Channel = module.Provider;
 
-				lastMessage = message;
+                message.SetContext(lastCommand);
 
-				raw.Enqueue(message);
+                if (message.Type == MessageType.Command) lastCommand = message;
+
+                raw.Enqueue(message);
 				return true;
 			};
 
@@ -45,7 +48,7 @@ namespace zer0.hud
 
 			Sniff(factory, channels, loader);
 
-			while (!raw.Any() || raw.TryPeek(out IMessage lastCommand) && lastCommand.Type == MessageType.Text && ((string)lastCommand.Message) != "exit")
+			while (!raw.Any() || raw.TryPeek(out IMessage lastMessage) && lastMessage.Type != MessageType.None && ((string)lastMessage.Message) != "exit")
 			{
 				Thread.Sleep(1000);
 			}

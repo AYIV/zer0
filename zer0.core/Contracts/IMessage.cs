@@ -13,5 +13,12 @@ namespace zer0.core.Contracts
 		IMessage Context { get; }
 
 		bool HasContext { get; }
-	}
+
+        IMessage SetContext(IMessage contextMessage);
+    }
+
+    public interface IChannelMessage : IMessage
+    {
+        string Channel { get; set; }
+    }
 }

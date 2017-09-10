@@ -4,20 +4,20 @@ using zer0.core.Contracts;
 
 namespace zer0.core.Messages
 {
-	public sealed class CommandMessage : MessageBase
+	public sealed class CommandMessage : MessageBase, IChannelMessage
 	{
 		public string Command { get; private set; }
 
-		public string Args { get; private set; }
+		public string[] Args { get; private set; }
+        public string Channel { get; set; }
 
-		public CommandMessage(string message)
+        public CommandMessage(string message)
 			: base(message, MessageType.Command)
 		{
 			var args = message.Split(' ');
-			if (args.Length < 2) return;
 
 			Command = args[0];
-			Args = string.Join(" ", args.Skip(1));
+			Args = args.Skip(1).ToArray();
 		}
 
 		public CommandMessage(string message, Guid id)

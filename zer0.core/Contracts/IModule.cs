@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace zer0.core.Contracts
+﻿namespace zer0.core.Contracts
 {
 	public interface IModule
 	{
@@ -17,10 +15,12 @@ namespace zer0.core.Contracts
 
 	public interface IContextable : IModule
 	{
-		void Init(IConfigProvider config, Func<IMessage, bool> callback);
+		void Init(IConfigProvider config, ZeroCallback callback);
 	}
 
 	public interface IChannel : IContextable { }
 
 	public interface ILoader : IContextable { }
+
+    public delegate bool ZeroCallback(IMessage message, IModule module);
 }

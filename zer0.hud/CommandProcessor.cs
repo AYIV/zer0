@@ -9,58 +9,53 @@ using zer0.core.Messages;
 
 namespace zer0.hud
 {
-	internal sealed class CommandProcessor
-	{
-		private readonly CommandLoader _loader;
-		private readonly IDictionary<string, IChannel> _channels;
+    internal sealed class CommandProcessor
+    {
+        private readonly CommandLoader _loader;
+        private readonly IDictionary<string, IChannel> _channels;
 
-		private readonly IDictionary<Guid, IAction> _actions;
+        private readonly IDictionary<Guid, IAction> _actions;
 
-		private readonly IDictionary<Guid, string> _processed;
-		
-		public CommandProcessor(CommandLoader loader, IEnumerable<IChannel> channels)
-		{
-			_loader = loader;
-			_channels = channels.ToDictionary(x => x.Provider, x => x);
-			_actions = new Dictionary<Guid, IAction>();
-			_processed = new Dictionary<Guid, string>();
-		}
+        private readonly IDictionary<Guid, string> _processed;
 
-		public void Process(IMessage message)
-		{
-			if (message.Type == MessageType.None)
-				throw new ArgumentException(nameof(message));
+        public CommandProcessor(CommandLoader loader, IEnumerable<IChannel> channels)
+        {
+            _loader = loader;
+            _channels = channels.ToDictionary(x => x.Provider, x => x);
+            _actions = new Dictionary<Guid, IAction>();
+            _processed = new Dictionary<Guid, string>();
+        }
 
-			if (message.Type == MessageType.Command)
-			{
-				var cmd = (CommandMessage) message;
+        public void Process(IMessage message)
+        {
+            if (message.Type == MessageType.None)
+                throw new ArgumentException(nameof(message));
 
-				_actions.Add(message.Id, _loader.Load(cmd.Command, cmd.Args));
-			}
+            if (!message.HasContext)
+            {
+                _channels.Values.ForEach(x => x.Process(message));
+                _processed[message.Id] = null;
+                return;
+            }
 
-			if (message.Type == MessageType.Text)
-			{
-				var channel = ((TextMessage)message).Channel ?? _processed.Key(message.Context.Id) ?? string.Empty;
-				if (_channels.ContainsKey(channel))
-					_channels[channel].Process(message);
-				else
-					_channels.Values.ForEach(x => x.Process(message));
+            var channel = ((IChannelMessage) message.Context).Channel;
+            
+            _channels[channel].Process(message);
+            
+            _processed[message.Id] = channel;
+        }
 
-				_processed[message.Id] = channel;
-			}
-		}
+        public void UtilizeActions()
+        {
+            if (!_actions.Any()) return;
 
-		public void UtilizeActions()
-		{
-			if (!_actions.Any()) return;
-
-			_actions
-				.Where(x => !x.Value.IsDone && x.Value.StartTime < DateTime.Now)
-				.ForEach(x =>
-				{
-					_channels.Values.ForEach(c => c.Process(new TextMessage(x.Value.Log(), x.Key)));
-					x.Value.IsDone = true;
-				});
-		}
-	}
+            _actions
+                .Where(x => !x.Value.IsDone && x.Value.StartTime < DateTime.Now)
+                .ForEach(x =>
+                {
+                    _channels.Values.ForEach(c => c.Process(new TextMessage(x.Value.Log(), x.Key)));
+                    x.Value.IsDone = true;
+                });
+        }
+    }
 }

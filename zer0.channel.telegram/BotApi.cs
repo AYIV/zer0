@@ -21,7 +21,7 @@ namespace zer0.channel.telegram
 		private const string CHAT_ID_KEY = "chat_id";
 		
 		private ITelegramBotClient _client;
-		private IDictionary<Guid, long> _chatMap;
+		private Map<Guid, long> _chatMap;
 
 		protected override void SafeInit()
 		{
@@ -32,11 +32,11 @@ namespace zer0.channel.telegram
 			{
 				if (e?.Message.Type != Telegram.Bot.Types.Enums.MessageType.TextMessage) return;
 
-				var msg = TextMessage.New(e.Message.Text);
+				var msg = CommandMessage.New(e.Message.Text);
 
 				_chatMap[msg.Id] = e.Message.Chat.Id;
 
-				ToZer0(msg);
+				ToZero(msg);
 			};
 		}
 
@@ -66,7 +66,7 @@ namespace zer0.channel.telegram
 
 		public new TValue this[TKey key]
 		{
-			get => this[ContainsKey(key) ? key : default(TKey)];
+			get => base[ContainsKey(key) ? key : default(TKey)];
 			set => base[key] = value;
 		}
 	}
