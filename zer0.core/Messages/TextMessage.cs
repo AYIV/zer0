@@ -3,10 +3,8 @@ using zer0.core.Contracts;
 
 namespace zer0.core.Messages
 {
-	public sealed class TextMessage : MessageBase, IChannelMessage
+	public sealed class TextMessage : ChannelMessageBase
 	{
-		public string Channel { get; set; }
-
 		public TextMessage(string message)
 			: base(message, MessageType.Text)
 		{

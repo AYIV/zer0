@@ -11,7 +11,7 @@ using IMessage = zer0.core.Contracts.IMessage;
 
 namespace zer0.channel.telegram
 {
-	[Export(typeof(IChannel))]
+	[Export(typeof(IModule))]
 	public class BotApi : ChannelBase, ISelfManagingChannel
 	{
 		public override string Provider => "Telegram";
@@ -32,7 +32,7 @@ namespace zer0.channel.telegram
 			{
 				if (e?.Message.Type != Telegram.Bot.Types.Enums.MessageType.TextMessage) return;
 
-				var msg = CommandMessage.New(e.Message.Text);
+				var msg = Command.New(e.Message.Text);
 
 				_chatMap[msg.Id] = e.Message.Chat.Id;
 
@@ -51,10 +51,7 @@ namespace zer0.channel.telegram
 
 		public void Stop() => _client.StopReceiving();
 
-		public override bool Supports(IMessage message)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool Supports(IMessage message) => message.Type == MessageType.Text;
 	}
 
 	internal sealed class Map<TKey, TValue> : Dictionary<TKey, TValue>

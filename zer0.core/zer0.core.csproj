@@ -54,7 +54,6 @@
     <Compile Include="Contracts\MessageType.cs" />
     <Compile Include="Contracts\ModuleBase.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
-    <Compile Include="Loaders\ChannelLoader.cs" />
     <Compile Include="Channels\ConsoleChannel.cs" />
     <Compile Include="Contracts\ActionBase.cs" />
     <Compile Include="Loaders\CommandLoader.cs" />
@@ -65,6 +64,8 @@
     <Compile Include="Contracts\IAction.cs" />
     <Compile Include="Contracts\ICommandFactory.cs" />
     <Compile Include="Loaders\Loader.cs" />
+    <Compile Include="Loaders\ModuleInitializer.cs" />
+    <Compile Include="Messages\ChannelMessageBase.cs" />
     <Compile Include="Messages\CommandMessage.cs" />
     <Compile Include="Messages\TextMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

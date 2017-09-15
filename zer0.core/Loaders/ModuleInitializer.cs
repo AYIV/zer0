@@ -5,30 +5,28 @@ using zer0.core.Extensions;
 
 namespace zer0.core
 {
-	public sealed class ChannelLoader : IDisposable
+	public sealed class ModuleInitializer : IDisposable
 	{
 		private readonly IObjectFactory _loader;
 		private readonly IConfigProviderFactory _configFactory;
 
-		public ChannelLoader(IObjectFactory loader)
+		public ModuleInitializer(IObjectFactory loader)
 		{
 			_loader = loader;
 
 			_configFactory = _loader.GetInstance<IConfigProviderFactory>();
 		}
 
-		public IEnumerable<IChannel> Load(ZeroCallback send)
+		public IEnumerable<IModule> Load(IEnumerable<IContextable> modules, ZeroCallback send)
 		{
-			var channels = _loader.GetInstances<IChannel>();
-
-			channels.ForEach(x =>
+			modules.ForEach(x =>
 			{
 				var config = _configFactory.Build(x);
 				config.Init(null);
 				x.Init(config, send);
 			});
 
-			return channels;
+			return modules;
 		}
 
 		public void Dispose() => _loader?.Dispose();

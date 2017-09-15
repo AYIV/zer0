@@ -12,18 +12,18 @@ using IMessage = zer0.core.Contracts.IMessage;
 
 namespace zer0.hud
 {
-	class Program
-	{
-		static ConcurrentQueue<IMessage> raw = new ConcurrentQueue<IMessage>();
+    class Program
+    {
+        static ConcurrentQueue<IMessage> raw = new ConcurrentQueue<IMessage>();
 
-		static void Main(string[] args)
-		{
-			Console.Title = "zer0";
-			Console.OutputEncoding = System.Text.Encoding.UTF8;
+        static void Main(string[] args)
+        {
+            Console.Title = "zer0";
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-			var lastCommand = (IMessage)null;
-			ZeroCallback func = (message, module) =>
-			{
+            var lastCommand = (IMessage)null;
+            ZeroCallback func = (message, module) =>
+            {
                 if (module is IChannel && message is IChannelMessage cmsg)
                     cmsg.Channel = module.Provider;
 
@@ -32,67 +32,60 @@ namespace zer0.hud
                 if (message.Type == MessageType.Command) lastCommand = message;
 
                 raw.Enqueue(message);
-				return true;
-			};
+                return true;
+            };
 
-			var factory = new Loader();
-			
-			var channels = new ChannelLoader(factory).Load(func);
+            var factory = new Loader();
+            var initializer = new ModuleInitializer(factory);
 
-			channels
-				.OfType<ISelfManagingChannel>()
-				.ForEach(x => x.Start());
+            var channels = initializer.Load(factory.GetInstances<IChannel>(), func);
+            
+            channels
+                .OfType<ISelfManagingChannel>()
+                .ForEach(x => x.Start());
 
-			var loader = factory.GetInstance<ILoader>();
-			loader.Init(null, func);
+            var modules = factory.Modules.Except(channels);
 
-			Sniff(factory, channels, loader);
+            initializer.Load(modules.OfType<IContextable>(), func);
 
-			while (!raw.Any() || raw.TryPeek(out IMessage lastMessage) && lastMessage.Type != MessageType.None && ((string)lastMessage.Message) != "exit")
-			{
-				Thread.Sleep(1000);
-			}
+            Sniff(channels, modules);
 
-			channels.ForEach(x => x.Process(TextMessage.New("Zer0 is shutting down. Cya :)")));
-		}
-		 
-		static void Sniff(IObjectFactory factory, IEnumerable<IChannel> channels, ILoader loader)
-		{
-			ThreadPool.QueueUserWorkItem(e =>
-			{
-				var cp = new CommandProcessor(new CommandLoader(factory), channels);
-				var ma = new MessageAnalyzer(new[] { loader });
+            while (
+                !raw.Any() ||
+                raw.TryPeek(out IMessage lastMessage) &&
+                lastMessage.Type != MessageType.None &&
+                ((string)lastMessage.Message) != "exit"
+            )
+                Thread.Sleep(1000);
 
-				while (true)
-				{
-					Thread.Sleep(1000);
+            channels
+                .ForEach(x => x.Process(
+                    TextMessage.New("Zer0 is shutting down. Cya :)")
+                ));
+        }
 
-					cp.UtilizeActions();
+        static void Sniff(IEnumerable<IModule> channels, IEnumerable<IModule> modules) => ThreadPool.QueueUserWorkItem(e =>
+        {
+            var mp = new MessageProcessor(channels);
+            var cp = new CommandProcessor(modules);
 
-					if (!raw.Any()) continue;
-					if (!raw.TryDequeue(out IMessage result)) continue;
+            while (true)
+            {
+                Thread.Sleep(1000);
 
-					//TODO: опросить модули на возможность обработки сообщения (не забыть про контекст переписки)
-					// если ни один модуль не увидел в сообщении "шаблон\команду", процессить как обычное текстовое сообщение.
-					if (ma.Process(result)) continue;
+                cp.UtilizeActions();
 
-					cp.Process(result);
-				}
-			});
-		}
-	}
+                if (!raw.Any()) continue;
+                if (!raw.TryDequeue(out IMessage result)) continue;
 
-	public sealed class MessageAnalyzer
-	{
-		private readonly IEnumerable<ILoader> _loaders;
+                if (result is ICommand command)
+                {
+                    cp.Process(command);
+                    continue;
+                }
 
-		public MessageAnalyzer(IEnumerable<ILoader> loaders)
-		{
-			_loaders = loaders;
-		}
-
-		public bool Process(IMessage message) => true == _loaders
-			.FirstOrDefault(x => x.Supports(message))
-			?.Process(message);
-	}
+                mp.Process((IChannelMessage)result);
+            }
+        });
+    }
 }

@@ -6,7 +6,7 @@ using zer0.core.Messages;
 
 namespace zer0.core
 {
-	[Export(typeof(IChannel))]
+	[Export(typeof(IModule))]
 	public class ConsoleChannel : ChannelBase, ISelfManagingChannel
 	{
 		public override string Provider => "Console";
@@ -22,7 +22,7 @@ namespace zer0.core
 
 		public void Start() => ThreadPool.QueueUserWorkItem(e =>
 		{
-			while (!_stopProcessing) ToZero(CommandMessage.New(Console.ReadLine()));
+			while (!_stopProcessing) ToZero(Command.New(Console.ReadLine()));
 		});
 
 		public void Stop() => _stopProcessing = true;

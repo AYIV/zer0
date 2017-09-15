@@ -7,7 +7,7 @@ using zer0.core.Messages;
 
 namespace zer0.loader.torrent
 {
-	[Export(typeof(ILoader))]
+	[Export(typeof(IModule))]
 	public class TorrentLoader : ModuleBase, ILoader, IDisposable
 	{
 		public override string Provider => "Torrent";
@@ -57,8 +57,8 @@ namespace zer0.loader.torrent
 		{
 			if (!Supports(message)) return false;
 
-			var msg = message is CommandMessage cmsg
-                ? cmsg.Command
+			var msg = message is ICommand cmsg
+                ? cmsg.Name
                 : (string)message.Message;
             msg = msg.Trim();
 

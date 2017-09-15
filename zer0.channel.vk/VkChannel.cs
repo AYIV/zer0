@@ -14,7 +14,7 @@ using zer0.core.Messages;
 
 namespace zer0.channel.vk
 {
-	[Export(typeof(IChannel))]
+	[Export(typeof(IModule))]
 	public class VkChannel : ChannelBase, ISelfManagingChannel
 	{
 		public override string Provider => "Vk";
@@ -127,9 +127,6 @@ namespace zer0.channel.vk
 				lastid: x["message"]["id"].ToString()
 			));
 
-		public override bool Supports(IMessage message)
-		{
-			throw new System.NotImplementedException();
-		}
+        public override bool Supports(IMessage message) => false;
 	}
 }

@@ -63,14 +63,8 @@ namespace zer0.storage.sqlite
 			}
 		}
 
-		public override bool Supports(IMessage message)
-		{
-			throw new NotImplementedException();
-		}
+        public override bool Supports(IMessage message) => false;
 
-		public override bool Process(IMessage message)
-		{
-			throw new NotImplementedException();
-		}
-	}
+		public override bool Process(IMessage message) => false;
+    }
 }

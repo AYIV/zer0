@@ -9,41 +9,46 @@ using zer0.core.Messages;
 
 namespace zer0.hud
 {
-    internal sealed class CommandProcessor
+    internal sealed class MessageProcessor
     {
-        private readonly CommandLoader _loader;
-        private readonly IDictionary<string, IChannel> _channels;
-
-        private readonly IDictionary<Guid, IAction> _actions;
-
-        private readonly IDictionary<Guid, string> _processed;
-
-        public CommandProcessor(CommandLoader loader, IEnumerable<IChannel> channels)
+        private readonly IDictionary<string, IModule> _channels;
+        
+        public MessageProcessor(IEnumerable<IModule> channels)
         {
-            _loader = loader;
             _channels = channels.ToDictionary(x => x.Provider, x => x);
-            _actions = new Dictionary<Guid, IAction>();
-            _processed = new Dictionary<Guid, string>();
         }
 
-        public void Process(IMessage message)
+        public void Process(IChannelMessage message)
         {
             if (message.Type == MessageType.None)
                 throw new ArgumentException(nameof(message));
 
-            if (!message.HasContext)
+            foreach (var ch in _channels)
             {
-                _channels.Values.ForEach(x => x.Process(message));
-                _processed[message.Id] = null;
-                return;
-            }
+                // do not send message to creator
+                if (ch.Key == message.Channel) continue;
 
-            var channel = ((IChannelMessage) message.Context).Channel;
-            
-            _channels[channel].Process(message);
-            
-            _processed[message.Id] = channel;
+                ch.Value.Process(message);
+            }
         }
+    }
+
+    internal sealed class CommandProcessor
+    {
+        private readonly IDictionary<string, IModule> _modules;
+        private readonly IDictionary<Guid, IAction> _actions;
+
+        public CommandProcessor(IEnumerable<IModule> modules)
+        {
+            _modules = modules.ToDictionary(x => x.Provider, x => x);
+
+            _actions = new Dictionary<Guid, IAction>();
+        }
+
+        public bool Process(ICommand command) => true == _modules
+            .Values
+            .FirstOrDefault(x => x.Supports(command))
+            ?.Process(command);
 
         public void UtilizeActions()
         {
@@ -53,7 +58,7 @@ namespace zer0.hud
                 .Where(x => !x.Value.IsDone && x.Value.StartTime < DateTime.Now)
                 .ForEach(x =>
                 {
-                    _channels.Values.ForEach(c => c.Process(new TextMessage(x.Value.Log(), x.Key)));
+                    _modules.Values.ForEach(c => c.Process(new TextMessage(x.Value.Log(), x.Key)));
                     x.Value.IsDone = true;
                 });
         }
