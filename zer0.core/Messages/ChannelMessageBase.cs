@@ -5,8 +5,6 @@ namespace zer0.core.Messages
 {
     public abstract class ChannelMessageBase : MessageBase, IChannelMessage
     {
-        private string _channel;
-
         public ChannelMessageBase(object message, MessageType type)
             : base(message, type)
         {
@@ -17,23 +15,6 @@ namespace zer0.core.Messages
         {
         }
 
-        public string Channel
-        {
-            get
-            {
-                if (!string.IsNullOrWhiteSpace(_channel))
-                    return _channel;
-
-                var root = (IMessage) this;
-                while (root.HasContext)
-                    root = root.Context;
-
-                return _channel = root is IChannelMessage cmsg
-                    ? cmsg.Channel
-                    : null;
-            }
-
-            set => _channel = value;
-        }
+        public string Channel { get; set; }
     }
 }

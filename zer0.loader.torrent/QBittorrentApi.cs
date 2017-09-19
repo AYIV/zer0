@@ -24,12 +24,13 @@ namespace zer0.loader.torrent
 
         public Torrent Get(Uri uri) => Get(uri.Btih());
 
-        public Torrent Get(string btih) => GetAll()
-            .FirstOrDefault(x => x.Hash.ToLower() == btih);
+        public Torrent Get(string btih) =>
+            GetAll().FirstOrDefault(x => x.Hash.ToLower() == btih);
 
         public IEnumerable<Torrent> Files(Uri uri) => Files(uri.Btih());
 
-        public IEnumerable<Torrent> Files(string btih) => Get<Torrent[]>($"{_host}/query/propertiesFiles/{btih}");
+        public IEnumerable<Torrent> Files(string btih) =>
+            Get<Torrent[]>($"{_host}/query/propertiesFiles/{btih}");
 
         public void Add(Uri uri, bool startDownloading = false)
         {
@@ -48,23 +49,13 @@ namespace zer0.loader.torrent
 
         public void Pause(Uri uri) => Pause(uri.Btih());
 
-        public void Pause(string btih)
-        {
-            _http.PostAsync(
-                $"{_host}/command/pause",
-                ("hash", btih)
-            ).Wait();
-        }
+        public void Pause(string btih) =>
+            _http.PostAsync($"{_host}/command/pause", ("hash", btih)).Wait();
 
         public void Recheck(Uri uri) => Recheck(uri.Btih());
 
-        public void Recheck(string btih)
-        {
-            _http.PostAsync(
-                $"{_host}/command/recheck",
-                ("hash", btih)
-            ).Wait();
-        }
+        public void Recheck(string btih) =>
+            _http.PostAsync($"{_host}/command/recheck", ("hash", btih)).Wait();
 
         public void Dispose() => _http?.Dispose();
 

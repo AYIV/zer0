@@ -34,11 +34,26 @@ namespace zer0.loader.torrent
 			_supportedCommands = new Dictionary<string, Func<IMessage, IMessage>>
 			{
 				{ "/files", Files },
-                { "/torrents", m => TextMessage.New($"{string.Join("\n\n", _torrent.GetAll().Select(x => x.Hash + "\n" + x.Name))}") }
+                { "/torrents", GetAll }
 			};
 
 			_torrent = new QBittorrentApi(Host);
 		}
+
+        private IList<Torrent> _torrents = new List<Torrent>();
+
+        private IMessage GetAll(IMessage message)
+        {
+            var torrents = _torrent.GetAll();
+            foreach (var torrent in torrents.Where(x => !_torrents.Contains(x)))
+                _torrents.Add(torrent);
+
+            var toString = "";
+            for (var i = 0; i < _torrents.Count; i++)
+                toString += $"{i}. {_torrents[i].Name}\n{_torrents[i].Hash}\n\n";
+
+            return TextMessage.New(toString);
+        }
 
 		public override bool Supports(IMessage message)
 		{
@@ -48,10 +63,15 @@ namespace zer0.loader.torrent
 
 			if (message.HasContext && _supportedCommands.Keys.Any(msg.StartsWith)) return true;
 
+            if (int.TryParse(msg, out int _) && message.HasContext && IsAnyCommand((string)message.Context.Message))
+                return true;
+
 			return null != msg
 				.Split()
 				.LastOrDefault(x => Uri.TryCreate(x, UriKind.Absolute, out Uri uri) && uri.IsMagnet());
 		}
+
+        private bool IsAnyCommand(string message) => _supportedCommands.Keys.Any(message.StartsWith);
 
 		public override bool Process(IMessage message)
 		{
@@ -68,6 +88,15 @@ namespace zer0.loader.torrent
                     _supportedCommands[msg](message),
                     this
                 );
+            }
+
+            if (int.TryParse(msg, out int index))
+            {
+                var torrent = _torrents[index];
+                torrentContext[message.Id] = torrent.Hash;
+
+                ToZer0(TextMessage.New($"Current torrent is set.\n{torrent.Name}"), this);
+                return true;
             }
 
 			var tokens = msg.ToLower().Split();
@@ -88,7 +117,7 @@ namespace zer0.loader.torrent
 		private IMessage Files(IMessage message)
 		{
 			if (!torrentContext.ContainsKey(message.Context.Id))
-				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH to proceed.", message);
+				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", message);
 
 			var files = _torrent.Files(torrentContext[message.Context.Id]);
 			return TextMessage.New($"{string.Join("\n", files.Select(x => x.Name))}");
