@@ -19,7 +19,7 @@ namespace zer0.core.Messages
 		public IEnumerable<string> Arguments { get; private set; }
 
         public Command(string message)
-			: base(message, MessageType.Command)
+			: base(message, null, MessageType.Command)
 		{
 			var args = message.Split(' ');
 
@@ -28,10 +28,24 @@ namespace zer0.core.Messages
 		}
 
 		public Command(string message, Guid id)
-			: base(message, MessageType.Command, id)
+			: base(message, null, MessageType.Command, id)
+		{
+		}
+
+		public Command(string message, object content, MessageType type)
+			: base(message, content, type)
 		{
 		}
 
 		public static IMessage New(string message) => new Command(message);
+	}
+
+	public sealed class Message : MessageBase
+	{
+		public Message(string message, object content, MessageType type) : base(message, content, type)
+		{
+		}
+
+		public static IMessage New(string message, byte[] content) => new Message(message, content, MessageType.Audio);
 	}
 }

@@ -10,5 +10,8 @@ namespace zer0.core.Extensions
 			foreach (var item in items)
 				action(item);
 		}
+
+		public static string Join<T>(this IEnumerable<T> enumerable, string separator)
+			=> string.Join(separator, enumerable);
 	}
 }

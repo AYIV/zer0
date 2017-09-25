@@ -12,9 +12,14 @@ using IMessage = zer0.core.Contracts.IMessage;
 
 namespace zer0.hud
 {
+	public static class Queue
+	{
+		public static void Message(IMessage message) => Program.RawQueue.Enqueue(message);
+	}
+
     class Program
     {
-        static ConcurrentQueue<IMessage> raw = new ConcurrentQueue<IMessage>();
+        public static ConcurrentQueue<IMessage> RawQueue = new ConcurrentQueue<IMessage>();
 
         static void Main(string[] args)
         {
@@ -31,7 +36,7 @@ namespace zer0.hud
 
                 if (message.Type == MessageType.Command) lastCommand = message;
 
-                raw.Enqueue(message);
+                RawQueue.Enqueue(message);
                 return true;
             };
 
@@ -51,8 +56,8 @@ namespace zer0.hud
             Sniff(channels, modules);
 
             while (
-                !raw.Any() ||
-                raw.TryPeek(out IMessage lastMessage) &&
+                !RawQueue.Any() ||
+                RawQueue.TryPeek(out IMessage lastMessage) &&
                 lastMessage.Type != MessageType.None &&
                 ((string)lastMessage.Message) != "exit"
             )
@@ -75,8 +80,8 @@ namespace zer0.hud
 
                 cp.UtilizeActions();
 
-                if (!raw.Any()) continue;
-                if (!raw.TryDequeue(out IMessage result)) continue;
+                if (!RawQueue.Any()) continue;
+                if (!RawQueue.TryDequeue(out IMessage result)) continue;
 
                 if (result is ICommand command)
                 {
@@ -84,7 +89,7 @@ namespace zer0.hud
                     continue;
                 }
 
-                mp.Process((IChannelMessage)result);
+                mp.Process(result);
             }
         });
     }

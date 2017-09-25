@@ -6,21 +6,24 @@ namespace zer0.core.Contracts
 	{
 		public Guid Id { get; private set; }
 
-		public object Message { get; protected set; }
+		public string Message { get; protected set; }
+
+		public object Content { get; protected set; }
 
 		public MessageType Type { get; private set; }
 		
 		public IMessage Context { get; private set; }
 
-		public MessageBase(object message, MessageType type)
-			: this(message, type, Guid.NewGuid())
+		public MessageBase(string message, object content, MessageType type)
+			: this(message, content, type, Guid.NewGuid())
 		{
 		}
 
-		public MessageBase(object message, MessageType type, Guid id)
+		public MessageBase(string message, object content, MessageType type, Guid id)
 		{
 			Id = id;
 			Message = message;
+			Content = content;
 			Type = type;
 		}
 		

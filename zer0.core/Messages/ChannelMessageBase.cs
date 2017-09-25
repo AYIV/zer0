@@ -5,13 +5,13 @@ namespace zer0.core.Messages
 {
     public abstract class ChannelMessageBase : MessageBase, IChannelMessage
     {
-        public ChannelMessageBase(object message, MessageType type)
-            : base(message, type)
+        public ChannelMessageBase(string message, object content, MessageType type)
+            : base(message, content, type)
         {
         }
 
-        public ChannelMessageBase(object message, MessageType type, Guid id)
-            : base(message, type, id)
+        public ChannelMessageBase(string message, object content, MessageType type, Guid id)
+            : base(message, content, type, id)
         {
         }
 

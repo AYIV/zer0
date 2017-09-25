@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
-
+using Telegram.Bot.Types;
 using zer0.core;
 using zer0.core.Contracts;
 using zer0.core.Messages;
@@ -50,14 +51,33 @@ namespace zer0.channel.telegram
 
 		public override bool Process(IMessage message)
 		{
-			if (message.Type != MessageType.Text) return false;
-			
-			return _client.SendTextMessageAsync(_chatMap[message.Id], message.Message.ToString()).Result != null;
+			switch (message.Type)
+			{
+				case MessageType.Text:
+					return _client.SendTextMessageAsync(_chatMap[message.Id], message.Message.ToString()).Result != null;
+
+				case MessageType.Audio:
+					{
+						return _client.SendAudioAsync(
+							_chatMap[message.Id],
+							new FileToSend(message.Message, new MemoryStream((byte[]) message.Content)),
+							message.Message,
+							0,
+							"",
+							message.Message
+						).Result != null;
+					}
+
+				default:
+					return false;
+			}
 		}
 
 		public void Stop() => _client.StopReceiving();
 
-        public override bool Supports(IMessage message) => message.Type == MessageType.Text;
+        public override bool Supports(IMessage message) =>
+			message.Type == MessageType.Text ||
+			message.Type == MessageType.Audio;
 	}
 
 	internal sealed class Map<TKey, TValue> : Dictionary<TKey, TValue>

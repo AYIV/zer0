@@ -27,9 +27,6 @@ namespace zer0.core
 
 		public void Stop() => _stopProcessing = true;
 
-		public override bool Supports(IMessage message)
-		{
-			throw new NotImplementedException();
-		}
+		public override bool Supports(IMessage message) => message.Type == MessageType.Text;
 	}
 }

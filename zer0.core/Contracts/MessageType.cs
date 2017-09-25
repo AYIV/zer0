@@ -4,6 +4,7 @@
 	{
 		None,
 		Text,
-		Command
+		Command,
+		Audio
 	}
 }

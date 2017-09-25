@@ -8,7 +8,9 @@ namespace zer0.core.Contracts
 
 		MessageType Type { get; }
 
-		object Message { get; }
+		string Message { get; }
+
+		object Content { get; }
 
 		IMessage Context { get; }
 

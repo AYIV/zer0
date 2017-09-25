@@ -18,18 +18,26 @@ namespace zer0.hud
             _channels = channels.ToDictionary(x => x.Provider, x => x);
         }
 
-        public void Process(IChannelMessage message)
+        public void Process(IMessage message)
         {
             if (message.Type == MessageType.None)
                 throw new ArgumentException(nameof(message));
 
-            foreach (var ch in _channels)
-            {
-                // do not send message to creator
-                if (ch.Key == message.Channel) continue;
+			if (message is IChannelMessage channelMessage)
+			{
+				foreach (var ch in _channels)
+				{
+					// do not send message to creator
+					if (ch.Key == channelMessage.Channel) continue;
 
-                ch.Value.Process(message);
-            }
+					ch.Value.Process(channelMessage);
+				}
+
+				return;
+			}
+
+			foreach (var channel in _channels.Values.Where(x => x.Supports(message)))
+				channel.Process(message);
         }
     }
 
@@ -45,10 +53,32 @@ namespace zer0.hud
             _actions = new Dictionary<Guid, IAction>();
         }
 
-        public bool Process(ICommand command) => true == _modules
-            .Values
-            .FirstOrDefault(x => x.Supports(command))
-            ?.Process(command);
+		public bool Process(ICommand command)
+		{
+			var module = _modules
+			  .Values
+			  .FirstOrDefault(x => x.Supports(command));
+			if (module == null) return false;
+
+			try
+			{
+				return module.Process(command);
+			}
+			catch (Exception ex)
+			{
+				Queue.Message(TextMessage.New($"{module.Provider} failed command processing.\nError is: {ex.Message}"));
+
+				/* TODO::
+				 * 1. set as failed module (or inactive)
+				 * 2. remove module from modules
+				 * 3. take snapshot (memento)
+				 * 4. reinit module
+				 * 5. add to active again
+				 */
+
+				return false;
+			}
+		}
 
         public void UtilizeActions()
         {

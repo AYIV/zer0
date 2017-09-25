@@ -6,12 +6,12 @@ namespace zer0.core.Messages
 	public sealed class TextMessage : ChannelMessageBase
 	{
 		public TextMessage(string message)
-			: base(message, MessageType.Text)
+			: base(message, null, MessageType.Text)
 		{
 		}
 
 		public TextMessage(string message, Guid id)
-			: base(message, MessageType.Text, id)
+			: base(message, null, MessageType.Text, id)
 		{
 		}
 

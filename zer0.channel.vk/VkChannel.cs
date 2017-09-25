@@ -12,6 +12,8 @@ using zer0.core.Contracts;
 using zer0.core.Extensions;
 using zer0.core.Messages;
 
+using Message = VkNet.Model.Message;
+
 namespace zer0.channel.vk
 {
 	[Export(typeof(IModule))]

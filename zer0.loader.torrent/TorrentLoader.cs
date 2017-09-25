@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text.RegularExpressions;
 using zer0.core.Contracts;
+using zer0.core.Extensions;
 using zer0.core.Messages;
 
 namespace zer0.loader.torrent
@@ -25,6 +26,7 @@ namespace zer0.loader.torrent
 
 		//TODO: move to settings
 		private const string Host = @"http://localhost:8080";
+		private const string RootFolder = @"D:\Shared\Torrents";
 
 		private IDictionary<string, Func<IMessage, IMessage>> _supportedCommands;
 
@@ -45,7 +47,7 @@ namespace zer0.loader.torrent
 		{
 			_supportedCommands = new Dictionary<string, Func<IMessage, IMessage>>
 			{
-				{ Commands.Files, Files },
+				{ Commands.Files, x => Files(x as ICommand) },
 				{ Commands.Torrents, GetAll },
 				{ Commands.DownloadOnly, DownloadOnly }
 			};
@@ -149,24 +151,35 @@ namespace zer0.loader.torrent
 
 			return added != null;
 		}
-
-		private IMessage Files(IMessage message)
+		
+		private IMessage Files(ICommand command)
 		{
-			if (!torrentContext.ContainsKey(message.Context.Id))
-				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", message);
+			if (command == null)
+				return TextMessage.New("Could not process meassage. Should be command instead.");
 
-			var files = Api.Files(torrentContext[message.Context.Id]);
-			return TextMessage.New($"{string.Join("\n", files.Select(x => x.Name))}");
+			if (!torrentContext.ContainsKey(command.Context.Id))
+				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", command);
+
+			var btih = torrentContext[command.Context.Id];
+			var torrent = _cache.ContainsKey(btih) ? _cache[btih] : (_cache[btih] = Api.Get(btih));
+
+			if (command.Arguments.Any(x => x == "get"))
+			{
+				torrent.Files.Where(x => x.Progress == 1).ForEach(x =>
+				{
+					var cmd = Message.New(
+						x.Name,
+						System.IO.File.ReadAllBytes($@"{RootFolder}\{x.Name}")
+					);
+					ToZer0(cmd, this);
+				});
+				
+				return TextMessage.New("Files sent.");
+			}
+			
+			return TextMessage.New($"{Api.Files(btih).Select(x => x.Name).Join("\n")}");
 		}
 
-		public void Dispose()
-		{
-			Api?.Dispose();
-		}
-	}
-
-	public static class StringExtensions
-	{
-		public static string Join<T>(this IEnumerable<T> enumerable, string separator) => string.Join(separator, enumerable);
+		public void Dispose() => Api?.Dispose();
 	}
 }
