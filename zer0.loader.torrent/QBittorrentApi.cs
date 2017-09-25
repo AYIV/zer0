@@ -24,13 +24,18 @@ namespace zer0.loader.torrent
 
         public Torrent Get(Uri uri) => Get(uri.Btih());
 
-        public Torrent Get(string btih) =>
-            GetAll().FirstOrDefault(x => x.Hash.ToLower() == btih);
+        public Torrent Get(string btih)
+        {
+            var torrent = GetAll().FirstOrDefault(x => x.Hash.ToLower() == btih);
+            if (torrent == null) return null;
 
-        public IEnumerable<Torrent> Files(Uri uri) => Files(uri.Btih());
+            torrent.Files = Files(btih);
+            return torrent;
+        }
 
-        public IEnumerable<Torrent> Files(string btih) =>
-            Get<Torrent[]>($"{_host}/query/propertiesFiles/{btih}");
+        public IEnumerable<File> Files(Uri uri) => Files(uri.Btih());
+
+        public IEnumerable<File> Files(string btih) => Get<File[]>($"{_host}/query/propertiesFiles/{btih}");
 
         public void Add(Uri uri, bool startDownloading = false)
         {
@@ -66,6 +71,24 @@ namespace zer0.loader.torrent
 
             return JsonConvert
                 .DeserializeObject<T>(json);
+        }
+
+        public void SetFilePriority(Torrent torrent)
+        {
+            var files = torrent.Files.ToArray();
+
+            for (var i = 0; i < files.Length; i++)
+                _http.PostAsync($"{_host}/command/setFilePrio",
+					("hash", torrent.Hash),
+					("id", i),
+					("priority", files[i].Priority)
+				).Wait();
+
+            torrent.Files = Files(torrent.Hash);
+
+            var updated = torrent.Files.ToArray();
+            for (var i = 0; i < updated.Length; i++)
+                if (files[i].Priority != updated[i].Priority) throw new Exception("Priority doesn't changed");
         }
     }
 }

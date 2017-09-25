@@ -32,6 +32,12 @@ namespace zer0.channel.telegram
 			{
 				if (e?.Message.Type != Telegram.Bot.Types.Enums.MessageType.TextMessage) return;
 
+				if (!_chatMap.IsInitializedProperly)
+				{
+					_chatMap[default(Guid)] = e.Message.Chat.Id;
+					_chatMap.IsInitializedProperly = true;
+				}
+
 				var msg = Command.New(e.Message.Text);
 
 				_chatMap[msg.Id] = e.Message.Chat.Id;
@@ -56,8 +62,13 @@ namespace zer0.channel.telegram
 
 	internal sealed class Map<TKey, TValue> : Dictionary<TKey, TValue>
 	{
+		public bool IsInitializedProperly { get; set; } = true;
+
 		public Map(TValue @default)
 		{
+			if (default(TValue).Equals(@default))
+				IsInitializedProperly = false;
+
 			this[default(TKey)] = @default;
 		}
 
