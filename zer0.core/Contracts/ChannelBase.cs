@@ -1,6 +1,6 @@
 ﻿namespace zer0.core.Contracts
 {
-	public abstract class ChannelBase : ModuleBase, IContextable
+	public abstract class ChannelBase : ModuleBase, IChannel
 	{
 		private ZeroCallback ToZer0 { get; set; }
 		
@@ -11,6 +11,10 @@
 			base.Init(config);
 		}
 
-        protected bool ToZero(IMessage message) => ToZer0(message, this);
+		public abstract bool Process(IMessage message);
+
+		public abstract bool Supports(IMessage message);
+
+		protected bool ToZero(IMessage message) => ToZer0(message, this);
 	}
 }

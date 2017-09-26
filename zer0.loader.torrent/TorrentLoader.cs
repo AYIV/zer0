@@ -14,9 +14,9 @@ namespace zer0.loader.torrent
 	{
 		private static class Commands
 		{
-			public static string Torrents = "/torrents";
-			public static string Files = "/files";
-			public static string DownloadOnly = "/downloadonly";
+			public static string Torrents = ".torrents";
+			public static string Files = ".files";
+			public static string DownloadOnly = ".downloadonly";
 
 			public static IEnumerable<string> ContextFree = new[] { Torrents };
 			public static IEnumerable<string> Contextable = new[] { Files, DownloadOnly };
@@ -28,7 +28,7 @@ namespace zer0.loader.torrent
 		private const string Host = @"http://localhost:8080";
 		private const string RootFolder = @"D:\Shared\Torrents";
 
-		private IDictionary<string, Func<IMessage, IMessage>> _supportedCommands;
+		private IDictionary<string, Func<ICommand, IMessage>> _supportedCommands;
 
 		private IDictionary<Guid, string> torrentContext = new Dictionary<Guid, string>();
 		private IDictionary<string, Torrent> _cache = new Dictionary<string, Torrent>();
@@ -45,9 +45,9 @@ namespace zer0.loader.torrent
 
 		protected override void SafeInit()
 		{
-			_supportedCommands = new Dictionary<string, Func<IMessage, IMessage>>
+			_supportedCommands = new Dictionary<string, Func<ICommand, IMessage>>
 			{
-				{ Commands.Files, x => Files(x as ICommand) },
+				{ Commands.Files, Files },
 				{ Commands.Torrents, GetAll },
 				{ Commands.DownloadOnly, DownloadOnly }
 			};
@@ -55,7 +55,7 @@ namespace zer0.loader.torrent
 			Api = new QBittorrentApi(Host);
 		}
 
-		private IMessage GetAll(IMessage message)
+		private IMessage GetAll(ICommand command)
 		{
 			var torrents = Api.GetAll();
 			foreach (var torrent in torrents.Except(_cache.Values))
@@ -71,18 +71,17 @@ namespace zer0.loader.torrent
 			);
 		}
 
-		private IMessage DownloadOnly(IMessage message)
+		private IMessage DownloadOnly(ICommand command)
 		{
-			if (!torrentContext.ContainsKey(message.Context.Id))
-				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", message);
+			if (!torrentContext.ContainsKey(command.Context.Id))
+				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", command);
 
-			var btih = torrentContext[message.Context.Id];
+			var btih = torrentContext[command.Context.Id];
 			var torrent = _cache.ContainsKey(btih) ? _cache[btih] : (_cache[btih] = Api.Get(btih));
-			var cmd = message as ICommand;
 
 			foreach (var file in torrent.Files)
 			{
-				file.Priority = Regex.IsMatch(file.Name, cmd.Arguments.First())
+				file.Priority = Regex.IsMatch(file.Name, command.Arguments.First())
 					? 7
 					: 0;
 			}
@@ -92,61 +91,55 @@ namespace zer0.loader.torrent
 			return TextMessage.New($"Priorities was set successfully! Files to downolad:\n{torrent.Files.Where(x => x.Priority == 7).Select(x => x.Name).Join(",")}");
 		}
 
-		public override bool Supports(IMessage message)
+		public bool Supports(ICommand message)
 		{
-			var msg = (string)message.Message;
+			if (string.IsNullOrWhiteSpace(message.Message)) return false;
 
-			if (string.IsNullOrWhiteSpace(msg)) return false;
+			if (message.HasContext && Commands.Contextable.Any(message.Message.StartsWith)) return true;
 
-			if (message.HasContext && Commands.Contextable.Any(msg.StartsWith)) return true;
-
-			if (int.TryParse(msg, out int _) && message.HasContext && Commands.Contextable.Any(((string)message.Context.Message).StartsWith))
+			if (int.TryParse(message.Message, out int _)
+				&& message.HasContext
+				&& Commands.Contextable.Any(message.Context.Message.StartsWith))
 				return true;
 
-			if (Commands.ContextFree.Any(msg.StartsWith))
+			if (Commands.ContextFree.Any(message.Message.StartsWith))
 				return true;
 
-			return null != msg
+			return null != message.Message
 				.Split()
 				.LastOrDefault(x => Uri.TryCreate(x, UriKind.Absolute, out Uri uri) && uri.IsMagnet());
 		}
 
-		public override bool Process(IMessage message)
+		public bool Process(ICommand command)
 		{
-			if (!Supports(message)) return false;
-
-			var msg = message is ICommand cmsg
-				? cmsg.Name
-				: (string)message.Message;
-			msg = msg.Trim();
-
-			if (_supportedCommands.ContainsKey(msg))
+			if (!Supports(command)) return false;
+			
+			if (_supportedCommands.ContainsKey(command.Name))
 			{
 				return ToZer0(
-					_supportedCommands[msg](message),
+					_supportedCommands[command.Name](command),
 					this
 				);
 			}
 
-			if (int.TryParse(msg, out int index))
+			if (int.TryParse(command.Name, out int index))
 			{
 				var torrent = _cache.Values.ElementAt(index);
-				torrentContext[message.Id] = torrent.Hash;
+				torrentContext[command.Id] = torrent.Hash;
 
 				ToZer0(TextMessage.New($"Current torrent is set.\n{torrent.Name}"), this);
 				return true;
 			}
+			
+			var link = new Uri(command.Name);
 
-			var tokens = msg.ToLower().Split();
-			var link = new Uri(tokens.Last());
-
-			Api.Add(link, tokens.Contains("start"));
+			Api.Add(link, command.Arguments.Contains("start"));
 
 			var added = Api.Get(link);
 			if (added != null)
 			{
 				ToZer0(TextMessage.New($"Torrent succesfully added!\n{added.Name}"), this);
-				torrentContext[message.Id] = added.Hash;
+				torrentContext[command.Id] = added.Hash;
 			}
 
 			return added != null;

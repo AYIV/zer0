@@ -17,7 +17,7 @@ namespace zer0.core
 			_configFactory = _loader.GetInstance<IConfigProviderFactory>();
 		}
 
-		public IEnumerable<IModule> Load(IEnumerable<IContextable> modules, ZeroCallback send)
+		public IEnumerable<T> Load<T>(IEnumerable<T> modules, ZeroCallback send) where T: IContextable
 		{
 			modules.ForEach(x =>
 			{

@@ -11,9 +11,9 @@ namespace zer0.hud
 {
     internal sealed class MessageProcessor
     {
-        private readonly IDictionary<string, IModule> _channels;
+        private readonly IDictionary<string, IModule<IMessage>> _channels;
         
-        public MessageProcessor(IEnumerable<IModule> channels)
+        public MessageProcessor(IEnumerable<IModule<IMessage>> channels)
         {
             _channels = channels.ToDictionary(x => x.Provider, x => x);
         }
@@ -43,10 +43,10 @@ namespace zer0.hud
 
     internal sealed class CommandProcessor
     {
-        private readonly IDictionary<string, IModule> _modules;
+        private readonly IDictionary<string, IModule<ICommand>> _modules;
         private readonly IDictionary<Guid, IAction> _actions;
 
-        public CommandProcessor(IEnumerable<IModule> modules)
+        public CommandProcessor(IEnumerable<IModule<ICommand>> modules)
         {
             _modules = modules.ToDictionary(x => x.Provider, x => x);
 
@@ -88,7 +88,7 @@ namespace zer0.hud
                 .Where(x => !x.Value.IsDone && x.Value.StartTime < DateTime.Now)
                 .ForEach(x =>
                 {
-                    _modules.Values.ForEach(c => c.Process(new TextMessage(x.Value.Log(), x.Key)));
+                    _modules.Values.ForEach(c => c.Process(new Command(x.Value.Log(), x.Key)));
                     x.Value.IsDone = true;
                 });
         }

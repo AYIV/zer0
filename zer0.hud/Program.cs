@@ -49,7 +49,10 @@ namespace zer0.hud
                 .OfType<ISelfManagingChannel>()
                 .ForEach(x => x.Start());
 
-            var modules = factory.Modules.Except(channels);
+            var modules = factory
+				.Modules
+				.Except(channels)
+				.OfType<IModule<ICommand>>();
 
             initializer.Load(modules.OfType<IContextable>(), func);
 
@@ -59,7 +62,7 @@ namespace zer0.hud
                 !RawQueue.Any() ||
                 RawQueue.TryPeek(out IMessage lastMessage) &&
                 lastMessage.Type != MessageType.None &&
-                ((string)lastMessage.Message) != "exit"
+                lastMessage.Message != "exit"
             )
                 Thread.Sleep(1000);
 
@@ -69,7 +72,7 @@ namespace zer0.hud
                 ));
         }
 
-        static void Sniff(IEnumerable<IModule> channels, IEnumerable<IModule> modules) => ThreadPool.QueueUserWorkItem(e =>
+        static void Sniff(IEnumerable<IModule<IMessage>> channels, IEnumerable<IModule<ICommand>> modules) => ThreadPool.QueueUserWorkItem(e =>
         {
             var mp = new MessageProcessor(channels);
             var cp = new CommandProcessor(modules);

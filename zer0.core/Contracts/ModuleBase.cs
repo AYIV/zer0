@@ -28,9 +28,5 @@
 		}
 
 		protected virtual void SafeInit() {}
-
-		public abstract bool Supports(IMessage message);
-
-		public abstract bool Process(IMessage message);
 	}
 }

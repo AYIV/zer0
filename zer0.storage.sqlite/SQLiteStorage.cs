@@ -62,9 +62,5 @@ namespace zer0.storage.sqlite
 				return action.Invoke(connection);
 			}
 		}
-
-        public override bool Supports(IMessage message) => false;
-
-		public override bool Process(IMessage message) => false;
     }
 }
