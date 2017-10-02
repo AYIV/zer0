@@ -11,11 +11,11 @@ namespace zer0.hud
 {
     internal sealed class MessageProcessor
     {
-        private readonly IDictionary<string, IModule<IMessage>> _channels;
+        private readonly IEnumerable<IModule<IMessage>> _channels;
         
         public MessageProcessor(IEnumerable<IModule<IMessage>> channels)
         {
-            _channels = channels.ToDictionary(x => x.Provider, x => x);
+            _channels = channels;
         }
 
         public void Process(IMessage message)
@@ -23,41 +23,31 @@ namespace zer0.hud
             if (message.Type == MessageType.None)
                 throw new ArgumentException(nameof(message));
 
+			var channels = _channels.Where(x => x.Supports(message));
+
 			if (message is IChannelMessage channelMessage)
-			{
-				foreach (var ch in _channels)
-				{
-					// do not send message to creator
-					if (ch.Key == channelMessage.Channel) continue;
+				channels = channels.Where(x => x.Provider != channelMessage.Channel);
 
-					ch.Value.Process(channelMessage);
-				}
-
-				return;
-			}
-
-			foreach (var channel in _channels.Values.Where(x => x.Supports(message)))
+			foreach (var channel in channels)
 				channel.Process(message);
         }
     }
 
     internal sealed class CommandProcessor
     {
-        private readonly IDictionary<string, IModule<ICommand>> _modules;
+        private readonly IEnumerable<IModule<ICommand>> _modules;
         private readonly IDictionary<Guid, IAction> _actions;
 
         public CommandProcessor(IEnumerable<IModule<ICommand>> modules)
         {
-            _modules = modules.ToDictionary(x => x.Provider, x => x);
+            _modules = modules;
 
             _actions = new Dictionary<Guid, IAction>();
         }
 
 		public bool Process(ICommand command)
 		{
-			var module = _modules
-			  .Values
-			  .FirstOrDefault(x => x.Supports(command));
+			var module = _modules.FirstOrDefault(x => x.Supports(command));
 			if (module == null) return false;
 
 			try
@@ -66,7 +56,7 @@ namespace zer0.hud
 			}
 			catch (Exception ex)
 			{
-				Queue.Message(TextMessage.New($"{module.Provider} failed command processing.\nError is: {ex.Message}"));
+				Queue.Message(TextMessage.New($"[{module.Provider}] failed command processing.\nError is: {ex.Message}"));
 
 				/* TODO::
 				 * 1. set as failed module (or inactive)
@@ -88,7 +78,7 @@ namespace zer0.hud
                 .Where(x => !x.Value.IsDone && x.Value.StartTime < DateTime.Now)
                 .ForEach(x =>
                 {
-                    _modules.Values.ForEach(c => c.Process(new Command(x.Value.Log(), x.Key)));
+                    _modules.ForEach(c => c.Process(new Command(x.Value.Log(), x.Key)));
                     x.Value.IsDone = true;
                 });
         }

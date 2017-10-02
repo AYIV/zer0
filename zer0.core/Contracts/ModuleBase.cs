@@ -28,5 +28,7 @@
 		}
 
 		protected virtual void SafeInit() {}
+
+		protected virtual void Failed() {}
 	}
 }

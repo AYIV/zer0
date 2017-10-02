@@ -14,9 +14,9 @@ namespace zer0.loader.torrent
 	{
 		private static class Commands
 		{
-			public static string Torrents = ".torrents";
-			public static string Files = ".files";
-			public static string DownloadOnly = ".downloadonly";
+			public const string Torrents = ".torrents";
+			public const string Files = ".files";
+			public const string DownloadOnly = ".downloadonly";
 
 			public static IEnumerable<string> ContextFree = new[] { Torrents };
 			public static IEnumerable<string> Contextable = new[] { Files, DownloadOnly };
@@ -30,7 +30,7 @@ namespace zer0.loader.torrent
 
 		private IDictionary<string, Func<ICommand, IMessage>> _supportedCommands;
 
-		private IDictionary<Guid, string> torrentContext = new Dictionary<Guid, string>();
+		private Torrent context;
 		private IDictionary<string, Torrent> _cache = new Dictionary<string, Torrent>();
 
 		private ZeroCallback ToZer0;
@@ -47,9 +47,9 @@ namespace zer0.loader.torrent
 		{
 			_supportedCommands = new Dictionary<string, Func<ICommand, IMessage>>
 			{
-				{ Commands.Files, Files },
+				{ Commands.Files, ContextCheck(Files) },
 				{ Commands.Torrents, GetAll },
-				{ Commands.DownloadOnly, DownloadOnly }
+				{ Commands.DownloadOnly, ContextCheck(DownloadOnly) }
 			};
 
 			Api = new QBittorrentApi(Host);
@@ -57,38 +57,29 @@ namespace zer0.loader.torrent
 
 		private IMessage GetAll(ICommand command)
 		{
-			var torrents = Api.GetAll();
-			foreach (var torrent in torrents.Except(_cache.Values))
+			foreach (var torrent in Api.GetAll().Except(_cache.Values))
 			{
 				torrent.Files = Api.Files(torrent.Hash);
 				_cache.Add(torrent.Hash, torrent);
 			}
 			
-			var i = 0;
-
 			return TextMessage.New(
-				_cache.Values.Select(x => $"{i++}. {x.Name}\n{x.Hash}").Join("\n\n")
+				_cache.Values.Select((i, x) => $"{i}. {x.Name} [-=-] {x.Progress * 100}% [-=-] {x.Size}\n{x.Hash}").Join("\n\n")
 			);
 		}
 
 		private IMessage DownloadOnly(ICommand command)
-		{
-			if (!torrentContext.ContainsKey(command.Context.Id))
-				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", command);
-
-			var btih = torrentContext[command.Context.Id];
-			var torrent = _cache.ContainsKey(btih) ? _cache[btih] : (_cache[btih] = Api.Get(btih));
-
-			foreach (var file in torrent.Files)
+		{	
+			foreach (var file in context.Files)
 			{
 				file.Priority = Regex.IsMatch(file.Name, command.Arguments.First())
 					? 7
 					: 0;
 			}
 
-			Api.SetFilePriority(torrent);
+			Api.SetFilePriority(context);
 
-			return TextMessage.New($"Priorities was set successfully! Files to downolad:\n{torrent.Files.Where(x => x.Priority == 7).Select(x => x.Name).Join(",")}");
+			return TextMessage.New($"Priorities was set successfully! Files to downolad:\n{context.Files.Where(x => x.Priority == 7).Select(x => x.Name).Join(",")}");
 		}
 
 		public bool Supports(ICommand message)
@@ -124,10 +115,9 @@ namespace zer0.loader.torrent
 
 			if (int.TryParse(command.Name, out int index))
 			{
-				var torrent = _cache.Values.ElementAt(index);
-				torrentContext[command.Id] = torrent.Hash;
+				context = _cache.Values.ElementAt(index);
 
-				ToZer0(TextMessage.New($"Current torrent is set.\n{torrent.Name}"), this);
+				ToZer0(TextMessage.New($"Current torrent is set.\n{context.Name}"), this);
 				return true;
 			}
 			
@@ -139,26 +129,25 @@ namespace zer0.loader.torrent
 			if (added != null)
 			{
 				ToZer0(TextMessage.New($"Torrent succesfully added!\n{added.Name}"), this);
-				torrentContext[command.Id] = added.Hash;
+				context = added;
 			}
 
 			return added != null;
 		}
 		
 		private IMessage Files(ICommand command)
-		{
-			if (command == null)
-				return TextMessage.New("Could not process meassage. Should be command instead.");
-
-			if (!torrentContext.ContainsKey(command.Context.Id))
-				return TextMessage.New($":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", command);
-
-			var btih = torrentContext[command.Context.Id];
-			var torrent = _cache.ContainsKey(btih) ? _cache[btih] : (_cache[btih] = Api.Get(btih));
-
+		{	
 			if (command.Arguments.Any(x => x == "get"))
 			{
-				torrent.Files.Where(x => x.Progress == 1).ForEach(x =>
+				var arg = command.Arguments.Skip(1).First();
+
+				var files = int.TryParse(arg, out int index)
+					? context.Files.ElementAt(index).AsEnumerable()
+					: arg == "loaded"
+						? context.Files.Where(x => x.Progress == 1)
+						: Enumerable.Empty<File>();
+
+				files.ForEach(x =>
 				{
 					var cmd = Message.New(
 						x.Name,
@@ -166,12 +155,20 @@ namespace zer0.loader.torrent
 					);
 					ToZer0(cmd, this);
 				});
-				
+
 				return TextMessage.New("Files sent.");
 			}
 			
-			return TextMessage.New($"{Api.Files(btih).Select(x => x.Name).Join("\n")}");
+			return TextMessage.New($"{context.Files.Select((i, x) => $"{i}. {x.Name} [-=-] {x.Progress * 100}").Join("\n")}");
 		}
+		
+		private Func<ICommand, IMessage> ContextCheck(Func<ICommand, IMessage> commandHandler) => cmd =>
+		{
+			if (context == null)
+				return TextMessage.New(":( Dunno which torrent you want to explore. Please use BTIH or magnet to proceed.", cmd);
+
+			return commandHandler(cmd);
+		};
 
 		public void Dispose() => Api?.Dispose();
 	}

@@ -54,7 +54,7 @@ namespace zer0.channel.vk
 
 				while (Sniffing)
 				{
-					Thread.Sleep(1000);
+					Thread.Sleep(15 * 60 * 1000);
 
 					var unreadDialogs = UnreadDialogs(GetUnreadDialogs());
 					if (unreadDialogs.All(x => _receivedMessages.Contains(x.lastid))) continue;

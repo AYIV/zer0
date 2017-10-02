@@ -6,7 +6,9 @@ namespace zer0.loader.torrent
 	{
 		public string Name { get; set; }
 		public string Hash { get; set; }
-        public IEnumerable<File> Files { get; set; }
+		public double Progress { get; set; }
+		public string Size { get; set; }
+		public IEnumerable<File> Files { get; set; }
 	}
 
     public class File
